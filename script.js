@@ -89,6 +89,8 @@ const Game = (function() {
     function checkboard(state){
         for(let item of state.gameboard.availableSpace){
             item.addEventListener("click",()=>{
+                if(item.textContent===""){
+                console.log("square clicked")
                 let i=0;
                 state.activePlayer===state.players[0]?state.players[0].occupiedSpace.push(item.id):state.players[1].occupiedSpace.push(item.id);
                 for(let sqr of state.gameboard.availableSpace){
@@ -99,6 +101,7 @@ const Game = (function() {
                     i++;
                 }
                 updateBoard(state,item);
+            }
             });
         }
     }
