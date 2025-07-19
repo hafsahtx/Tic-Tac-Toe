@@ -1,69 +1,57 @@
-function createPlayer(name){
-    let symbol;
-    let turn;
-    if(name==="player1"){
-        symbol = 'X';
-        turn = true;
-    }else{
-        symbol = 'O';
-        turn = false;
+const Game = (function() {
+    function gameState(players){
+        let gameboard = createGameBoard()
+        let activePlayer = players[0];  
+        return {players,gameboard,activePlayer}      
     }
-    return {name,symbol,turn};
-}
-
-function createGameboard(){
-    let items = Array.from(document.querySelectorAll("div.item"));
-    return items;
-}
-
-function gameState(players){
-    //flow of game
-    let availableSpace = 9;
-    let activePlayer = players[0];
-    return {availableSpace, activePlayer};
-}
-
-function changeActivePlayer(state,finishedTurn,players){
-    if(state.activePlayer.symbol === "X"&&finishedTurn===true){
-        state.activePlayer = players[1]
-    }else if(state.activePlayer.symbol === "O"&&finishedTurn===true){
-        state.activePlayer = players[0];
+    function createGameBoard(){
+        let availableSpace = Array.from(document.querySelectorAll("div.item"));
+        return {availableSpace,occupiedSpace: []}
     }
-}
-function updateBoard(square,state,players){
-    if(square){
-        if(state.activePlayer.symbol === "X"){
-            console.log("AAA")
-            square.innerHTML = "X";
+    function changeActivePlayer(state){
+        if(state.activePlayer === state.players[0]){
+            state.activePlayer = state.players[1];
         }else{
-            console.log("BBBB")
-            square.innerHTML = "O";
+            state.activePlayer = state.players[0];
         }
     }
-    changeActivePlayer(state,true,players)
-}
-
-function checkBoard(gameboard,state,players){
-    for(let item of gameboard){
-        item.addEventListener("click",(e)=>{
-            console.log(`square ${e.target.textContent} was selected`);
-            updateBoard(item, state,players);
-            return true;
-        })
+    function updateBoard(state,item){
+        if(state.activePlayer===state.players[0]){
+            item.innerHTML = "X"
+        }else{
+            item.innerHTML = "O";
+        }
+        //check logic here
+        //for now change player
+        changeActivePlayer(state);
         
     }
-    return false;
-}
-
-
-
-function playGame(){
-    let players = [createPlayer("player1"), createPlayer("player2")]
-    let gameboard = createGameboard();
-    let state = gameState(players);
-    let finishedTurn = checkBoard(gameboard,state,players);
-}
-
-
-
-playGame();
+    function checkboard(state){
+        for(let item of state.gameboard.availableSpace){
+            item.addEventListener("click",()=>{
+                let i=0;
+                state.gameboard.occupiedSpace.push(item);
+                console.log(state.gameboard.availableSpace);
+                for(let sqr of state.gameboard.availableSpace){
+                    console.log('......')
+                    if(sqr===item){
+                        state.gameboard.availableSpace.splice(i,1);
+                        break;
+                    }
+                    i++;
+                }
+                updateBoard(state,item);
+            });
+        }
+    }
+    function startGame(){
+        const players = [{name: 'player1', symbol: 'X'},{name: 'player2', symbol: 'O'}];
+        const state = gameState(players);
+        console.log(state);
+        checkboard(state)
+    }    
+    return {
+        init: startGame
+    }
+})();
+Game.init();
