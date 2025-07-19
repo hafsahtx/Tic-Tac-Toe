@@ -8,12 +8,18 @@ const Game = (function() {
         let availableSpace = Array.from(document.querySelectorAll("div.item"));
         return {availableSpace,occupiedSpace: []}
     }
+    function showDialog(player,state){
+        console.log('dialog function entered')
+        const dialog = document.getElementById('dialog');
+        const text = document.getElementById('text');
+        text.innerHTML = `Player${player} is the winner!`
+        dialog.showModal();
+    }
     function checkWin(state,player){
         let checkarr;
         let winningarr = [['sqr1','sqr2','sqr3'],['sqr4','sqr5','sqr6'],['sqr7','sqr8','sqr9'],
                           ['sqr1','sqr4','sqr7'],['sqr2','sqr5','sqr8'],['sqr3','sqr6','sqr9'],
                           ['sqr1','sqr5','sqr9'],['sqr3','sqr5','sqr7']];
-        //357,123 not working
         if(player===1){
             checkarr = state.players[0].occupiedSpace;
         }else{
@@ -64,6 +70,7 @@ const Game = (function() {
         }
 
         if(check){
+            showDialog(player,state);
             console.log(`player${player} has won!`)
         }
         
