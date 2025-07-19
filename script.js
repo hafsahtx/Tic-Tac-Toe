@@ -21,8 +21,10 @@ const Game = (function() {
             state.players[0].occupiedSpace = [];
             state.players[1].occupiedSpace = [];
             state.activePlayer = state.players[0];
+            reset.style.display = 'none';
             startGame();
         })
+        
     }
     function showDialog(message,state){
         console.log('dialog function entered')
@@ -31,6 +33,8 @@ const Game = (function() {
         text.innerHTML = message;
         dialog.showModal();
         state.gameEnd = true;
+        const reset = document.getElementById("reset");
+        reset.style.display = 'block';
         resetBoard(state);
     }
     function checkWin(state,player){
