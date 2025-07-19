@@ -8,11 +8,11 @@ const Game = (function() {
         let availableSpace = Array.from(document.querySelectorAll("div.item"));
         return {availableSpace,occupiedSpace: []}
     }
-    function showDialog(player,state){
+    function showDialog(message,state){
         console.log('dialog function entered')
         const dialog = document.getElementById('dialog');
         const text = document.getElementById('text');
-        text.innerHTML = `Player${player} is the winner!`
+        text.innerHTML = message;
         dialog.showModal();
     }
     function checkWin(state,player){
@@ -51,6 +51,7 @@ const Game = (function() {
     function updateBoard(state,item){
         let player;
         let check;
+        let message;
         if(state.activePlayer===state.players[0]){
             item.innerHTML = "X"
             player = 1;
@@ -70,8 +71,15 @@ const Game = (function() {
         }
 
         if(check){
-            showDialog(player,state);
+            //win
+            message = `player ${player} has won!`
+            showDialog(message,state);
             console.log(`player${player} has won!`)
+        }else if(state.gameboard.availableSpace.length===0){
+            //draw
+            message = "It's a draw!";
+            showDialog(message,state);
+            console.log("It's a draw##");
         }
         
         //for now change player
