@@ -1,16 +1,20 @@
 const Game = (function() {
     function gameState(players){
-        let gameboard = createGameBoard()
+        let gameboard = document.querySelector(".container");
         let gameEnd = false;
-        let activePlayer = players[0];  
-        return {players,gameboard,activePlayer,gameEnd}      
+        let activePlayer = players[0];
+        let availableSpace = 9;
+        let winning = [['sqr1','sqr2','sqr3'],['sqr4','sqr5','sqr6'],['sqr7','sqr8','sqr9'],
+        ['sqr1','sqr4','sqr7'],['sqr2','sqr5','sqr8'],['sqr3','sqr6','sqr9'],
+        ['sqr1','sqr5','sqr9'],['sqr3','sqr5','sqr7']];
+        return {players,gameboard,activePlayer,gameEnd,availableSpace,winning};      
     }
-    function createGameBoard(){
-        let availableSpace = Array.from(document.querySelectorAll("div.item"));
-        return {availableSpace,occupiedSpace: []}
-    }
+
+
     function resetBoard(state){
         let resetBtn = document.getElementById("reset");
+        let startBtn = document.getElementById("submit");
+        let container = document.querySelector(".container");
         resetBtn.addEventListener("click",()=>{
             for(let sqr of state.players[0].occupiedSpace){
                 sqr.innerHTML = "";
@@ -22,12 +26,12 @@ const Game = (function() {
             state.players[1].occupiedSpace = [];
             state.activePlayer = state.players[0];
             reset.style.display = 'none';
-            startGame();
+            container.style.display = "none";
+            startBtn.disabled = false;
         })
         
     }
     function showDialog(message,state){
-        console.log('dialog function entered')
         const dialog = document.getElementById('dialog');
         const text = document.getElementById('text');
         text.innerHTML = message;
@@ -39,9 +43,7 @@ const Game = (function() {
     }
     function checkWin(state,player){
         let checkarr;
-        let winningarr = [['sqr1','sqr2','sqr3'],['sqr4','sqr5','sqr6'],['sqr7','sqr8','sqr9'],
-                          ['sqr1','sqr4','sqr7'],['sqr2','sqr5','sqr8'],['sqr3','sqr6','sqr9'],
-                          ['sqr1','sqr5','sqr9'],['sqr3','sqr5','sqr7']];
+        let winningarr = state.winning;
         if(player===1){
             checkarr = state.players[0].occupiedSpace;
         }else{
@@ -61,7 +63,6 @@ const Game = (function() {
             });
             if(count===3)return true;
         }
-
         return false;
     }
 
@@ -69,9 +70,8 @@ const Game = (function() {
         if(state.activePlayer === state.players[0]){
             state.activePlayer = state.players[1];
         }else{
-            state.activePlayer = state.players[0];
+            state.activePlayer = state.players[0];           
         }
-       
     }
 
     function updateBoard(state,item){
@@ -98,47 +98,52 @@ const Game = (function() {
 
         if(check){
             //win
-            message = `player ${player} has won!`
+            if(player===1){
+                message = `${state.players[0].name} has won!`
+            }else{
+                message = `${state.players[1].name} has won!`
+            }
             showDialog(message,state);
-            console.log(`player${player} has won!`)
-        }else if(state.gameboard.availableSpace.length===0){
+        }else if(state.availableSpace===0){
             //draw
             message = "It's a draw!";
             showDialog(message,state);
-            console.log("It's a draw##");
+        }else{
+            changeActivePlayer(state);
         }
-        
-        //for now change player
-        changeActivePlayer(state);
-        
     }
+    
     function checkboard(state){
-        for(let item of state.gameboard.availableSpace){
-            item.addEventListener("click",()=>{
-                if(item.textContent==="" && !state.gameEnd){
-                console.log("square clicked")
-                let i=0;
-                state.activePlayer===state.players[0]?state.players[0].occupiedSpace.push(item):state.players[1].occupiedSpace.push(item);
-                for(let sqr of state.gameboard.availableSpace){
-                    if(sqr===item){
-                        state.gameboard.availableSpace.splice(i,1);
-                        break;
-                    }
-                    i++;
+        state.gameboard.addEventListener("click",(event)=>{
+            if(event.target.matches(".item")){
+                if(event.target.innerHTML==="" && !state.gameEnd){
+                    console.log(state.players[0].name,state.players[1].name)
+                    state.activePlayer===state.players[0]?state.players[0].occupiedSpace.push(event.target):state.players[1].occupiedSpace.push(event.target);
+                    state.availableSpace--;
+                    updateBoard(state,event.target);
                 }
-                updateBoard(state,item);
             }
-            });
-        }
+        });
     }
-    function startGame(){
-        const players = [{name: 'player1', symbol: 'X', occupiedSpace: []},{name: 'player2', symbol:'O', occupiedSpace: []}];
+
+    function startGame(player1, player2){
+        const players = [{name: player1, symbol: 'X', occupiedSpace: []},{name: player2, symbol:'O', occupiedSpace: []}];
         const state = gameState(players);
-        console.log(state);
-        checkboard(state)
+        checkboard(state);
     }    
     return {
-        init: startGame
+        start: startGame
     }
 })();
-Game.init();
+const startBtn = document.getElementById("submit");
+startBtn.addEventListener("click",(e)=>{
+    e.preventDefault();
+    const form = document.getElementsByName("playerForm")[0];
+    const player1 = document.forms['playerForm']["player1"].value;
+    const player2 = document.forms['playerForm']["player2"].value;
+    const container = document.querySelector(".container");
+    form.reset();
+    startBtn.disabled = true;
+    container.style.display = "flex";
+    Game.start(player1,player2);
+ });
