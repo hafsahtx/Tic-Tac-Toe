@@ -48,13 +48,8 @@ const game = (function() {
     }
 
     function checkWin(state,player){
-        let checkarr;
         let winningarr = state.winning;
-        if(player===1){
-            checkarr = state.players[0].occupiedSpace;
-        }else{
-            checkarr = state.players[1].occupiedSpace;
-        }
+        let checkarr = player.occupiedSpace;
         let idArray = []
         for(let element of checkarr){
             idArray.push(element.id);
@@ -81,34 +76,18 @@ const game = (function() {
     }
 
     function updateBoard(state,item){
-        let player;
+        let playerIndex = state.activePlayer === state.players[0] ? 0 : 1;
+        let player = state.players[playerIndex];
         let check;
         let message;
-        if(state.activePlayer===state.players[0]){
-            item.innerHTML = state.activePlayer.symbol;
-            player = 1;
-        }else{
-            item.innerHTML = state.activePlayer.symbol;
-            player = 2;
-        }
+        item.innerHTML = player.symbol;
         //check logic here
-        if(player===1){
-            if(state.players[0].occupiedSpace.length>=3){
-                check = checkWin(state,player)
-            }
-        }else{
-            if(state.players[1].occupiedSpace.length>=3){
-                check = checkWin(state,player)
-            }
+        if(player.occupiedSpace.length>=3){
+            check = checkWin(state,player)
         }
-
         if(check){
             //win
-            if(player===1){
-                message = `${state.players[0].name} is the winner!`
-            }else{
-                message = `${state.players[1].name} is the winner!`
-            }
+            message = `${player.name} is the winner!`
             showDialog(message,state);
         }else if(state.availableSpace===0){
             //draw
