@@ -50,15 +50,11 @@ const game = (function() {
     function checkWin(state,player){
         let winningarr = state.winning;
         let checkarr = player.occupiedSpace;
-        let idArray = []
-        for(let element of checkarr){
-            idArray.push(element.id);
-        }
         let count = 0;
         for(const x of winningarr){
             count=0;
             x.forEach((num)=>{
-                if(idArray.includes(num)){
+                if(checkarr.includes(num)){
                     count++;
                 }
             });
@@ -75,9 +71,7 @@ const game = (function() {
         }
     }
 
-    function updateBoard(state,item){
-        let playerIndex = state.activePlayer === state.players[0] ? 0 : 1;
-        let player = state.players[playerIndex];
+    function updateBoard(state,item,player){
         let check;
         let message;
         item.innerHTML = player.symbol;
@@ -102,9 +96,11 @@ const game = (function() {
         const handler = function (event){
             if(event.target.matches(".item")){
                 if(event.target.innerHTML==="" && !state.gameEnd){
-                    state.activePlayer===state.players[0]?state.players[0].occupiedSpace.push(event.target):state.players[1].occupiedSpace.push(event.target);
+                    let playerIndex = state.activePlayer === state.players[0] ? 0 : 1;
+                    let player = state.players[playerIndex];
+                    player.occupiedSpace.push(event.target.id);
                     state.availableSpace--;
-                    updateBoard(state,event.target);
+                    updateBoard(state,event.target,player);
                 }
             }
         }
