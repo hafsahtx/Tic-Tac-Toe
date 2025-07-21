@@ -4,10 +4,12 @@ const Game = (function() {
         let gameEnd = false;
         let activePlayer = players[0];
         let availableSpace = 9;
+        let clickHandler = null;
         let winning = [['sqr1','sqr2','sqr3'],['sqr4','sqr5','sqr6'],['sqr7','sqr8','sqr9'],
-        ['sqr1','sqr4','sqr7'],['sqr2','sqr5','sqr8'],['sqr3','sqr6','sqr9'],
-        ['sqr1','sqr5','sqr9'],['sqr3','sqr5','sqr7']];
-        return {players,gameboard,activePlayer,gameEnd,availableSpace,winning};      
+                       ['sqr1','sqr4','sqr7'],['sqr2','sqr5','sqr8'],['sqr3','sqr6','sqr9'],
+                       ['sqr1','sqr5','sqr9'],['sqr3','sqr5','sqr7']];
+        
+        return {players,gameboard,activePlayer,gameEnd,availableSpace,winning,clickHandler};      
     }
 
 
@@ -26,6 +28,7 @@ const Game = (function() {
             state.players[1].occupiedSpace = [];
             state.activePlayer = state.players[0];
             reset.style.display = 'none';
+            state.gameboard.removeEventListener("click",state.clickHandler);
             container.style.display = "none";
             startBtn.disabled = false;
         })
@@ -41,6 +44,7 @@ const Game = (function() {
         reset.style.display = 'block';
         resetBoard(state);
     }
+
     function checkWin(state,player){
         let checkarr;
         let winningarr = state.winning;
@@ -99,9 +103,9 @@ const Game = (function() {
         if(check){
             //win
             if(player===1){
-                message = `${state.players[0].name} has won!`
+                message = `${state.players[0].name} is the winner!`
             }else{
-                message = `${state.players[1].name} has won!`
+                message = `${state.players[1].name} is the winner!`
             }
             showDialog(message,state);
         }else if(state.availableSpace===0){
@@ -112,18 +116,19 @@ const Game = (function() {
             changeActivePlayer(state);
         }
     }
-    
+
     function checkboard(state){
-        state.gameboard.addEventListener("click",(event)=>{
+        const handler = function (event){
             if(event.target.matches(".item")){
                 if(event.target.innerHTML==="" && !state.gameEnd){
-                    console.log(state.players[0].name,state.players[1].name)
                     state.activePlayer===state.players[0]?state.players[0].occupiedSpace.push(event.target):state.players[1].occupiedSpace.push(event.target);
                     state.availableSpace--;
                     updateBoard(state,event.target);
                 }
             }
-        });
+        }
+        state.clickHandler = handler;
+        state.gameboard.addEventListener("click",state.clickHandler);
     }
 
     function startGame(player1, player2){
