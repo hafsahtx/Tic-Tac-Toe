@@ -1,4 +1,4 @@
-const Game = (function() {
+const game = (function() {
     function gameState(players){
         let gameboard = document.querySelector(".container");
         let gameEnd = false;
@@ -11,7 +11,9 @@ const Game = (function() {
         
         return {players,gameboard,activePlayer,gameEnd,availableSpace,winning,clickHandler};      
     }
-
+    function player(name,symbol){
+        return{name, symbol, occupiedSpace: []}
+    }
 
     function resetBoard(state){
         let resetBtn = document.getElementById("reset");
@@ -83,10 +85,10 @@ const Game = (function() {
         let check;
         let message;
         if(state.activePlayer===state.players[0]){
-            item.innerHTML = "X"
+            item.innerHTML = state.activePlayer.symbol;
             player = 1;
         }else{
-            item.innerHTML = "O";
+            item.innerHTML = state.activePlayer.symbol;
             player = 2;
         }
         //check logic here
@@ -132,7 +134,7 @@ const Game = (function() {
     }
 
     function startGame(player1, player2){
-        const players = [{name: player1, symbol: 'X', occupiedSpace: []},{name: player2, symbol:'O', occupiedSpace: []}];
+        const players = [player(player1,"X"),player(player2,"O")]
         const state = gameState(players);
         checkboard(state);
     }    
@@ -150,5 +152,5 @@ startBtn.addEventListener("click",(e)=>{
     form.reset();
     startBtn.disabled = true;
     container.style.display = "flex";
-    Game.start(player1,player2);
+    game.start(player1,player2);
  });
